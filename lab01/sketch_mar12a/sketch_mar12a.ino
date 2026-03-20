@@ -4,7 +4,7 @@ void setup() {
   // 初始化串口通信
   Serial.begin(115200);
   // 初始化板载LED引脚为输出模式
-  pinMode(LED_PIN_Y, OUTPUT);
+  pinMode(LED_PIN_Y, OUTPUT);  
 }
 
 void loop() {
@@ -13,4 +13,5 @@ void loop() {
   delay(1000);                   // 等待1秒
   digitalWrite(LED_PIN_Y, LOW);    // 熄灭LED
   delay(1000);              // 等待1秒
+  
 }
