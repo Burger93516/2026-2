@@ -1,22 +1,35 @@
-const int ledPin = 12;
+// ex04 触摸自锁开关
+const int TOUCH_PIN = 2;  // 触摸传感器引脚
+const int LED_PIN   = 9;  // LED引脚
 
-unsigned long previousMillis = 0;
-const long interval = 500;  // 500ms 翻转一次 → 1Hz
-
-bool ledState = LOW;
+bool ledState = false;          // LED当前状态
+bool lastTouchState = false;    // 上一次触摸状态
+unsigned long lastDebounceTime = 0;
+unsigned long debounceDelay = 50;  // 防抖50ms
 
 void setup() {
-  pinMode(ledPin, OUTPUT);
+  pinMode(TOUCH_PIN, INPUT);
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, ledState);
 }
 
 void loop() {
-  unsigned long currentMillis = millis();
+  // 读取当前触摸值
+  int currentTouch = digitalRead(TOUCH_PIN);
+  unsigned long now = millis();
 
-  if (currentMillis - previousMillis >= interval) {
-    previousMillis = currentMillis;
+  // 防抖过滤
+  if (currentTouch != lastTouchState) {
+    lastDebounceTime = now;
+  }
 
-    // 翻转LED状态
-    ledState = !ledState;
-    digitalWrite(ledPin, ledState);
+  // 防抖时间满足 + 检测到**按下瞬间**（边缘检测）
+  if ((now - lastDebounceTime) > debounceDelay) {
+    // 上一次没按，现在按了 → 翻转LED
+    if (currentTouch == HIGH && lastTouchState == LOW) {
+      ledState = !ledState;
+      digitalWrite(LED_PIN, ledState);
+    }
+    lastTouchState = currentTouch;
   }
 }
