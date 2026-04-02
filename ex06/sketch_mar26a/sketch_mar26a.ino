@@ -1,4 +1,4 @@
-// ex06 警车双闪（双通道反相PWM）
+   // ex06 警车双闪（双通道反相PWM）
 const int LED_A = 9;   // 第一个LED
 const int LED_B = 10;  // 第二个LED
 
