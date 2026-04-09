@@ -70,12 +70,7 @@ void loop() {
       isIncreasing = true;
     }
   }
-<<<<<<< HEAD
 
   ledcWrite(LED_PIN, dutyCycle);
   delay(10);
-=======
-  ledcWrite(LED_PIN, dutyCycle);
-  delay(10);  // 基础延时，步长决定呼吸快慢
->>>>>>> 1a534836466a89f576a342df067d170f2915191d
 }
