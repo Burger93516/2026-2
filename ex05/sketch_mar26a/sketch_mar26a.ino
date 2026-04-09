@@ -1,30 +1,27 @@
 #include <Arduino.h>
 
 // 引脚定义
-#define TOUCH_PIN  32   // 触摸引脚
-#define LED_PIN    2     // LED引脚
-#define THRESHOLD  600    // 触摸阈值
+#define TOUCH_PIN  T0   // 触摸引脚
+#define LED_PIN    21   // LED引脚
+#define THRESHOLD  200  // 触摸阈值
 
 // 呼吸灯参数
-const int freq = 5000;
-const int resolution = 8;
 int dutyCycle = 0;
 bool isIncreasing = true;
 
-// 触摸自锁与防抖
-bool ledState = false;
+// 触摸防抖
 bool isTouched = false;
 unsigned long lastTouchTime = 0;
 const unsigned long debounceDelay = 50;
 
-// 档位控制：1=慢，2=中，3=快
+// 档位控制：慢、中、快
 int currentSpeed = 1;
-const int stepSlow = 1;    // 慢档步长
-const int stepMid  = 5;   // 中档步长
-const int stepFast = 10;  // 快档步长
+const int stepSlow = 1;
+const int stepMid  = 5;
+const int stepFast = 10;
 int currentStep = stepSlow;
 
-// 触摸中断函数（带防抖）
+// 触摸中断
 void gotTouch() {
   unsigned long now = millis();
   if (now - lastTouchTime < debounceDelay) return;
@@ -32,7 +29,7 @@ void gotTouch() {
 
   int val = touchRead(TOUCH_PIN);
   if (val < THRESHOLD && !isTouched) {
-    // 触摸瞬间：切换档位
+    // 切换档位
     currentSpeed = (currentSpeed % 3) + 1;
     switch(currentSpeed) {
       case 1: currentStep = stepSlow; break;
@@ -40,7 +37,7 @@ void gotTouch() {
       case 3: currentStep = stepFast; break;
     }
     isTouched = true;
-    Serial.print("当前档位: ");
+    Serial.print("档位：");
     Serial.println(currentSpeed);
   } else if (val >= THRESHOLD && isTouched) {
     isTouched = false;
@@ -49,14 +46,17 @@ void gotTouch() {
 
 void setup() {
   Serial.begin(115200);
-  // 初始化PWM
-  ledcAttach(LED_PIN, freq, resolution);
-  // 初始化触摸中断
+  pinMode(LED_PIN, OUTPUT);
+  
+  // 老版本ESP32兼容写法
+  ledcAttach(LED_PIN, 5000, 8);
+  
+  // 触摸中断
   touchAttachInterrupt(TOUCH_PIN, gotTouch, THRESHOLD);
 }
 
 void loop() {
-  // 呼吸灯核心逻辑
+  // 呼吸灯
   if (isIncreasing) {
     dutyCycle += currentStep;
     if (dutyCycle >= 255) {
@@ -70,6 +70,7 @@ void loop() {
       isIncreasing = true;
     }
   }
+
   ledcWrite(LED_PIN, dutyCycle);
-  delay(10);  // 基础延时，步长决定呼吸快慢
+  delay(10);
 }

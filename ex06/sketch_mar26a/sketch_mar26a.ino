@@ -1,6 +1,6 @@
    // ex06 警车双闪（双通道反相PWM）
-const int LED_A = 9;   // 第一个LED
-const int LED_B = 10;  // 第二个LED
+const int LED_A = 4;   // 第一个LED
+const int LED_B = 17;  // 第二个LED
 
 void setup() {
   pinMode(LED_A, OUTPUT);
